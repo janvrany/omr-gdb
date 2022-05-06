@@ -45,7 +45,7 @@ class TR__Node(__TRObject):
 
     def to_string(self):
         opcd = strip_ns_prefix(self._val['_opCode']['_opCode'])
-        return "0x%x [%s, BCI=(%d, %d)]" % (to_addr(self._val), opcd, self._val['_byteCodeInfo']['_callerIndex'], self._val['_byteCodeInfo']['_byteCodeIndex'])
+        return "0x%x [%s, bci=[%d, %d, -]" % (to_addr(self._val), opcd, self._val['_byteCodeInfo']['_callerIndex'], self._val['_byteCodeInfo']['_byteCodeIndex'])
 
 class TR__Register(__TRObject):
     def to_string(self):
