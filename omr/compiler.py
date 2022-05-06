@@ -15,6 +15,13 @@ def strip_ns_prefix(printable):
     else:
         return s[i+2:]
 
+def to_addr(val):
+    if val.type.code == gdb.TYPE_CODE_PTR:
+        return int(val)
+    else:
+        return int(val.address)
+
+
 
 class __TRObject(CxxPrettyPrinter):
     def __init__(self, val):
@@ -37,9 +44,8 @@ class TR__Node(__TRObject):
             return reg
 
     def to_string(self):
-        addr = int(self._val) if self._val.type.code == gdb.TYPE_CODE_PTR  else self._val.address
         opcd = strip_ns_prefix(self._val['_opCode']['_opCode'])
-        return "0x%x [%s]" % (int(self._val), opcd)
+        return "0x%x [%s, BCI=(%d, %d)]" % (to_addr(self._val), opcd, self._val['_byteCodeInfo']['_callerIndex'], self._val['_byteCodeInfo']['_byteCodeIndex'])
 
 class TR__Register(__TRObject):
     def to_string(self):
@@ -50,16 +56,16 @@ class TR__Register(__TRObject):
             reg = str(regno)
         else:
             reg = 'virtual'
-        return "0x%x [V %s]" % (int(self._val), reg)
+        return "0x%x [V %s]" % (to_addr(self._val), reg)
 
 class TR__RealRegister(__TRObject):
     def to_string(self):
-        return "0x%x [R %s]" % (int(self._val), strip_ns_prefix(self._val['_registerNumber']))
+        return "0x%x [R %s]" % (to_addr(self._val), strip_ns_prefix(self._val['_registerNumber']))
         #return "0x%x [R ???]" % (int(self._val))
 
 class TR__Instruction(__TRObject):
     def to_string(self):
-        return "0x%x [%s]" % (int(self._val), strip_ns_prefix(self._val['_opcode']['_mnemonic']))
+        return "0x%x [%s]" % (to_addr(self._val), strip_ns_prefix(self._val['_opcode']['_mnemonic']))
 
 
 class TR(CxxCollectionPrettyPrinter):
